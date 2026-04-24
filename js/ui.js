@@ -219,6 +219,18 @@ export function renderLogs(logs) {
       title.innerHTML = `<strong>${escapeHtml(log.label ?? log.type)}</strong> — ${escapeHtml(log.content)}`;
     }
 
+    if (log.summary) {
+      const summary = document.createElement("p");
+      summary.innerHTML = `🧠 핵심: ${escapeHtml(log.summary)}`;
+      item.appendChild(summary);
+    }
+
+    if (log.confusion) {
+      const confusion = document.createElement("p");
+      confusion.innerHTML = `❗ 헷갈림: ${escapeHtml(log.confusion)}`;
+      item.appendChild(confusion);
+    }
+
     const meta = document.createElement("div");
     meta.className = "log-meta";
 
