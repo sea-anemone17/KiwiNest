@@ -81,10 +81,11 @@ export function renderAll(pet) {
   renderSnacks();
   renderRoom(pet);
   renderAchievements(pet);
+  renderReview(pet);
+  renderStats(pet);
   renderLogs(pet.logs);
   renderDiary(pet);
 }
-
 export function renderPet(pet) {
   applyTheme(pet.theme);
 
