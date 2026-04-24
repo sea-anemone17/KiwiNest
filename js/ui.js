@@ -249,6 +249,57 @@ export function renderLogs(logs) {
   });
 }
 
+export function renderReview(pet) {
+  const list = qs("reviewList");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  const queue = pet.reviewQueue ?? [];
+  const dueItems = queue.filter((item) => item.due <= Date.now());
+
+  if (!dueItems.length) {
+    list.innerHTML = `<p class="muted">지금 복습할 항목이 없어요.</p>`;
+    return;
+  }
+
+  dueItems.forEach((item) => {
+    const div = document.createElement("div");
+    div.className = "log-item";
+    div.innerHTML = `
+      <p><strong>📌 ${escapeHtml(item.subject)}</strong> — ${escapeHtml(item.content)}</p>
+      <p>🧠 ${escapeHtml(item.summary)}</p>
+      ${item.confusion ? `<p>❗ ${escapeHtml(item.confusion)}</p>` : ""}
+      <div class="log-meta">복습 예정 항목</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+export function renderStats(pet) {
+  const panel = qs("statsPanel");
+  if (!panel) return;
+
+  const subjectEntries = Object.entries(pet.subjectCounts ?? {});
+  const subjectText = subjectEntries.length
+    ? subjectEntries
+        .map(([subject, count]) => `<span class="badge">${escapeHtml(subject)} ${count}회</span>`)
+        .join("")
+    : `<span class="muted">아직 과목 기록이 없어요.</span>`;
+
+  const dueReviewCount = (pet.reviewQueue ?? []).filter((item) => item.due <= Date.now()).length;
+
+  panel.innerHTML = `
+    <div class="log-item">
+      <p><strong>총 공부</strong>: ${pet.totalStudyCount ?? 0}회</p>
+      <p><strong>오늘 공부</strong>: ${pet.goals?.completedToday ?? 0}회</p>
+      <p><strong>연속 공부</strong>: ${pet.streak?.count ?? 0}일</p>
+      <p><strong>복습 대기</strong>: ${dueReviewCount}개</p>
+      <div class="badge-row">${subjectText}</div>
+    </div>
+  `;
+}
+
 export function renderDiary(pet) {
   const list = qs("diaryList");
   list.innerHTML = "";
