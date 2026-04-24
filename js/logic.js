@@ -4,6 +4,13 @@ import { generateDiary } from "./diary.js";
 import { applyQuestRewards } from "./quests.js";
 import { checkAchievements } from "./achievements.js";
 
+import { UNDERSTANDING_LEVELS } from "./data.js";
+
+const baseExp = getExpByDifficulty(difficulty);
+const bonus = UNDERSTANDING_LEVELS.find(x => x.id === understanding)?.bonus || 0;
+
+const expGained = baseExp + bonus;
+
 export function getTodayString() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -32,7 +39,14 @@ export function gainExp(pet, amount) {
   return leveledUp;
 }
 
-export function recordStudy(pet, { subject, content, difficulty }) {
+export function recordStudy(pet, {
+  subject,
+  content,
+  difficulty,
+  summary,
+  confusion,
+  understanding
+}) {
   const today = getTodayString();
   const expGained = getExpByDifficulty(difficulty);
   const leveledUp = gainExp(pet, expGained);
@@ -58,7 +72,10 @@ export function recordStudy(pet, { subject, content, difficulty }) {
     difficulty,
     expGained,
     reward: SUBJECT_REWARDS[subject] ?? "✨ 반짝 조각",
-    leveledUp
+    leveledUp,
+    summary,
+    confusion,
+    understanding
   };
 
   pet.logs.unshift(log);
