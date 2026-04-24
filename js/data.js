@@ -128,3 +128,10 @@ export const ACHIEVEMENTS = [
   { id: "math-5", title: "논리 조약돌 수집가", description: "수학을 5회 기록했어요.", condition: { type: "subject", subject: "수학", value: 5 } },
   { id: "level-5", title: "공부하는 친구", description: "레벨 5를 달성했어요.", condition: { type: "level", value: 5 } }
 ];
+
+export const UNDERSTANDING_LEVELS = [
+  { id: "low", label: "애매함", bonus: 0 },
+  { id: "mid", label: "대충 이해", bonus: 3 },
+  { id: "high", label: "설명 가능", bonus: 6 },
+  { id: "master", label: "가르칠 수 있음", bonus: 10 }
+];
