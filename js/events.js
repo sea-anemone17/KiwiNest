@@ -56,6 +56,9 @@ function handleStudyComplete() {
 
   const subject = qs("subjectSelect").value;
   const content = qs("studyContentInput").value.trim();
+  const summary = qs("summaryInput").value.trim();
+  const confusion = qs("confusionInput").value.trim();
+  const understanding = selectedSetup.understanding;
   const difficulty = selectedSetup.difficulty;
 
   if (!content) {
@@ -63,7 +66,14 @@ function handleStudyComplete() {
     return;
   }
 
-  const result = recordStudy(currentPet, { subject, content, difficulty });
+  const result = recordStudy(currentPet, {
+    subject,
+    content,
+    difficulty,
+    summary,
+    confusion,
+    understanding
+  });
   ensureDailyMission(currentPet);
 
   const status = getStatusDialogue(currentPet);
