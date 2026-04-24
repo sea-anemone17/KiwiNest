@@ -8,10 +8,6 @@
   .pet-card {
     grid-template-columns: 1fr;
   }
-
-  .action-grid {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 @media (max-width: 640px) {
@@ -40,6 +36,10 @@
 
   .action-grid {
     grid-template-columns: 1fr;
+  }
+
+  .action-grid .primary-btn {
+    grid-column: auto;
   }
 
   .target-row {
