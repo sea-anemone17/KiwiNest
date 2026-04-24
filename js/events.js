@@ -104,8 +104,17 @@ function handleSnack(snackId) {
 
 function handlePatHead() {
   if (!currentPet) return;
-  applyCareEffect(currentPet);
+
+  if (currentPet.tickets.care <= 0) {
+    setDialogue("돌봄 티켓이 없어요. 그래도 머리에 손 올리기는 기록할 수 있지만, 보상은 작게 들어가요.");
+    currentPet.stats.affinity += 1;
+  } else {
+    currentPet.tickets.care -= 1;
+    applyCareEffect(currentPet);
+  }
+
   recordSiblingAction(currentPet, "patHead");
+
   currentPet.logs.unshift({
     id: crypto.randomUUID(),
     type: "care",
@@ -114,6 +123,7 @@ function handlePatHead() {
     content: "머리에 손 올리기 기록 완료",
     expGained: 0
   });
+
   saveAndRender("머리에 손을 올려 줬어요. 친밀도가 올랐어요.");
 }
 
