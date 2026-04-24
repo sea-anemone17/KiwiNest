@@ -3,25 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dear Kiwi</title>
+  <title>KiwiNest</title>
+  <link rel="stylesheet" href="./css/themes.css" />
   <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/mobile.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="app-header">
       <div>
-        <p class="eyebrow">Tamagotchi Study System</p>
-        <h1>🥝 Kiwi Nest</h1>
+        <p class="eyebrow">Tamagotchi Study Nest</p>
+        <h1>🥝 KiwiNest</h1>
       </div>
-      <button id="resetBtn" class="ghost-btn" type="button">초기화</button>
+      <div class="header-actions">
+        <button id="exportBtn" class="ghost-btn" type="button">백업</button>
+        <label class="ghost-btn file-label">
+          복원
+          <input id="importInput" type="file" accept="application/json" hidden />
+        </label>
+        <button id="resetBtn" class="ghost-btn danger" type="button">초기화</button>
+      </div>
     </header>
 
     <main>
-      <!-- SETUP SCREEN -->
       <section id="setupScreen" class="screen setup-screen hidden">
         <div class="card hero-card">
-          <h2>키울 친구를 정해 주세요</h2>
-          <p class="muted">공부하면 이 친구가 자라고, 간식 티켓도 얻을 수 있어요.</p>
+          <h2>둥지에 데려올 친구를 정해 주세요</h2>
+          <p class="muted">공부하면 자라고, 간식과 돌봄으로 기분이 좋아지는 작은 공부 친구예요.</p>
 
           <label class="field">
             <span>이름</span>
@@ -43,77 +51,119 @@
             <div id="personalityOptions" class="option-grid"></div>
           </div>
 
-          <button id="startBtn" class="primary-btn" type="button">시작하기</button>
+          <button id="startBtn" class="primary-btn" type="button">둥지 만들기</button>
         </div>
       </section>
 
-      <!-- MAIN SCREEN -->
       <section id="mainScreen" class="screen main-screen hidden">
-        <section class="card pet-card">
-          <div class="pet-visual">
-            <div id="petEmoji" class="pet-emoji">🥝</div>
-          </div>
-
-          <div class="pet-info">
-            <p id="stageLabel" class="eyebrow">알에서 나온 키위</p>
-            <h2><span id="petName">키위후니</span> <span id="petLevel">Lv.1</span></h2>
-
-            <div class="exp-wrap">
-              <div class="exp-label">
-                <span>EXP</span>
-                <span id="expText">0 / 100</span>
-              </div>
-              <div class="exp-bar">
-                <div id="expFill" class="exp-fill"></div>
-              </div>
+        <section class="dashboard-grid">
+          <article class="card pet-card">
+            <div id="roomScene" class="room-scene">
+              <img id="petImage" class="pet-image hidden" src="" alt="키우는 동물 이미지" />
+              <div id="petEmoji" class="pet-emoji">🥝</div>
+              <div id="roomDecorations" class="room-decorations"></div>
             </div>
 
-            <div class="stats">
-              <div><strong id="knowledgeStat">0</strong><span>지식</span></div>
-              <div><strong id="affinityStat">0</strong><span>친밀도</span></div>
-              <div><strong id="moodStat">70</strong><span>기분</span></div>
-              <div><strong id="snackTicketStat">0</strong><span>간식 티켓</span></div>
-            </div>
-          </div>
-        </section>
+            <div class="pet-info">
+              <p id="stageLabel" class="eyebrow">알에서 나온 친구</p>
+              <h2><span id="petName">몽글이</span> <span id="petLevel">Lv.1</span></h2>
 
-        <section class="card dialogue-card">
-          <p id="dialogueText">오늘은 뭘 배울까요?</p>
+              <div class="exp-wrap">
+                <div class="exp-label">
+                  <span>EXP</span>
+                  <span id="expText">0 / 100</span>
+                </div>
+                <div class="exp-bar"><div id="expFill" class="exp-fill"></div></div>
+              </div>
+
+              <div class="stats">
+                <div><strong id="knowledgeStat">0</strong><span>지식</span></div>
+                <div><strong id="affinityStat">0</strong><span>친밀도</span></div>
+                <div><strong id="moodStat">70</strong><span>기분</span></div>
+                <div><strong id="hungerStat">50</strong><span>배고픔</span></div>
+                <div><strong id="sleepinessStat">20</strong><span>졸림</span></div>
+                <div><strong id="streakStat">0</strong><span>연속일</span></div>
+              </div>
+            </div>
+          </article>
+
+          <aside class="side-stack">
+            <article class="card dialogue-card">
+              <p id="dialogueText">오늘은 뭘 배울까요?</p>
+            </article>
+
+            <article class="card quest-card">
+              <div class="section-title">
+                <h3>🎯 오늘의 미션</h3>
+                <button id="refreshMissionBtn" class="ghost-btn small" type="button">새 미션</button>
+              </div>
+              <p id="dailyMissionText" class="mission-text"></p>
+              <div class="target-row">
+                <label for="todayTargetInput">오늘 목표</label>
+                <input id="todayTargetInput" type="number" min="1" max="20" value="3" />
+                <button id="setTargetBtn" class="secondary-btn small" type="button">설정</button>
+              </div>
+              <div id="questList" class="quest-list"></div>
+            </article>
+          </aside>
         </section>
 
         <section class="action-grid">
-          <button id="openStudyBtn" class="primary-btn" type="button">📚 공부 기록하기</button>
-          <button id="giveSnackBtn" class="secondary-btn" type="button">🥛 간식 주기</button>
-          <button id="careBtn" class="secondary-btn" type="button">🫳 쓰다듬기 기록</button>
+          <button id="completeStudyBtn" class="primary-btn" type="button">📚 설명 완료!</button>
+          <button id="studyTogetherBtn" class="secondary-btn" type="button">👥 같이 공부했어요</button>
+          <button id="openSnackBtn" class="secondary-btn" type="button">🥛 간식 주기</button>
+          <button id="patHeadBtn" class="secondary-btn" type="button">🫳 머리에 손 올리기</button>
+          <button id="letterBtn" class="secondary-btn" type="button">💌 편지 받기</button>
         </section>
 
-        <section class="card study-panel">
-          <h3>오늘 키위에게 가르칠 것</h3>
+        <section class="content-grid">
+          <article class="card study-panel">
+            <h3>오늘 가르친 것</h3>
+            <label class="field">
+              <span>과목</span>
+              <select id="subjectSelect"></select>
+            </label>
+            <label class="field">
+              <span>공부 내용</span>
+              <input id="studyContentInput" type="text" placeholder="예: 영어 본문 1개 구조화" />
+            </label>
+            <div class="field">
+              <span>난이도</span>
+              <div id="difficultyOptions" class="option-grid"></div>
+            </div>
+          </article>
 
-          <label class="field">
-            <span>과목</span>
-            <select id="subjectSelect"></select>
-          </label>
+          <article class="card snack-panel">
+            <h3>간식/돌봄</h3>
+            <p class="muted">간식 티켓: <strong id="snackTicketStat">0</strong>장 · 돌봄 티켓: <strong id="careTicketStat">0</strong>장</p>
+            <div id="snackList" class="item-grid"></div>
+          </article>
 
-          <label class="field">
-            <span>공부 내용</span>
-            <input id="studyContentInput" type="text" placeholder="예: 영어 본문 1개 구조화" />
-          </label>
+          <article class="card room-panel">
+            <h3>방 꾸미기</h3>
+            <p class="muted">레벨이 오르면 장식이 열려요.</p>
+            <div id="roomItemList" class="item-grid"></div>
+          </article>
 
-          <div class="field">
-            <span>난이도</span>
-            <div id="difficultyOptions" class="option-grid"></div>
-          </div>
-
-          <button id="completeStudyBtn" class="primary-btn" type="button">설명 완료!</button>
+          <article class="card achievement-panel">
+            <h3>업적</h3>
+            <div id="achievementList" class="achievement-list"></div>
+          </article>
         </section>
 
-        <section class="card log-card">
-          <div class="section-title">
+        <section class="content-grid lower-grid">
+          <article class="card diary-panel">
+            <div class="section-title">
+              <h3>🥝 키위 일기</h3>
+              <button id="clearDiaryBtn" class="ghost-btn small" type="button">정리</button>
+            </div>
+            <div id="diaryList" class="log-list"></div>
+          </article>
+
+          <article class="card log-card">
             <h3>성장 일지</h3>
-            <button id="backupBtn" class="ghost-btn" type="button">백업</button>
-          </div>
-          <div id="logList" class="log-list"></div>
+            <div id="logList" class="log-list"></div>
+          </article>
         </section>
       </section>
     </main>
