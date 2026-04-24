@@ -1,7 +1,6 @@
 import { loadPet } from "./storage.js";
-import { bindEvents, setCurrentPet } from "./events.js";
-import { renderSetupOptions, showSetup, showMain, renderPet, setDialogue } from "./ui.js";
-import { getRandomDialogue } from "./logic.js";
+import { bindEvents, bootPet } from "./events.js";
+import { renderSetupOptions, showSetup } from "./ui.js";
 
 function init() {
   renderSetupOptions();
@@ -10,10 +9,7 @@ function init() {
   const savedPet = loadPet();
 
   if (savedPet) {
-    setCurrentPet(savedPet);
-    showMain();
-    renderPet(savedPet);
-    setDialogue(getRandomDialogue(savedPet));
+    bootPet(savedPet);
   } else {
     showSetup();
   }
