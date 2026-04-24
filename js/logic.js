@@ -1,11 +1,21 @@
 import { DIFFICULTIES, SUBJECT_REWARDS, STAGES, DIALOGUES } from "./data.js";
+import { applyStudyStatusEffect } from "./petStatus.js";
+import { generateDiary } from "./diary.js";
+import { applyQuestRewards } from "./quests.js";
+import { checkAchievements } from "./achievements.js";
 
 export function getTodayString() {
   return new Date().toISOString().slice(0, 10);
 }
 
+export function daysBetween(dateA, dateB) {
+  const a = new Date(dateA + "T00:00:00");
+  const b = new Date(dateB + "T00:00:00");
+  return Math.round((b - a) / (1000 * 60 * 60 * 24));
+}
+
 export function getExpByDifficulty(difficultyId) {
-  return DIFFICULTIES.find((item) => item.id === difficultyId)?.exp ?? 10;
+  return DIFFICULTIES.find((item) => item.id === difficultyId)?.exp ?? 12;
 }
 
 export function gainExp(pet, amount) {
@@ -13,14 +23,12 @@ export function gainExp(pet, amount) {
   pet.stats.knowledge += amount;
 
   let leveledUp = false;
-
   while (pet.exp >= pet.expMax) {
     pet.exp -= pet.expMax;
     pet.level += 1;
-    pet.expMax = Math.round(pet.expMax * 1.12);
+    pet.expMax = Math.round(pet.expMax * 1.13);
     leveledUp = true;
   }
-
   return leveledUp;
 }
 
@@ -29,21 +37,16 @@ export function recordStudy(pet, { subject, content, difficulty }) {
   const expGained = getExpByDifficulty(difficulty);
   const leveledUp = gainExp(pet, expGained);
 
-  if (pet.lastStudyDate !== today) {
-    pet.studyCountToday = 0;
-    pet.lastStudyDate = today;
-    pet.streak += 1;
-  }
+  updateStreakForStudy(pet, today);
 
-  pet.studyCountToday += 1;
+  pet.goals.completedToday += 1;
   pet.totalStudyCount += 1;
-  pet.stats.affinity += 3;
-  pet.stats.mood = Math.min(100, pet.stats.mood + 4);
+  pet.subjectCounts[subject] = (pet.subjectCounts[subject] ?? 0) + 1;
 
-  let ticketGained = false;
+  applyStudyStatusEffect(pet);
+
   if (pet.totalStudyCount % 3 === 0) {
     pet.tickets.snack += 1;
-    ticketGained = true;
   }
 
   const log = {
@@ -54,51 +57,33 @@ export function recordStudy(pet, { subject, content, difficulty }) {
     content,
     difficulty,
     expGained,
-    reward: SUBJECT_REWARDS[subject] ?? "반짝 조각",
-    ticketGained,
+    reward: SUBJECT_REWARDS[subject] ?? "✨ 반짝 조각",
     leveledUp
   };
 
   pet.logs.unshift(log);
+  const diaryEntry = generateDiary(pet, log);
+  const questMessages = applyQuestRewards(pet);
+  const achievements = checkAchievements(pet);
 
-  return { expGained, ticketGained, leveledUp, log };
+  return { expGained, leveledUp, log, diaryEntry, questMessages, achievements };
 }
 
-export function giveSnack(pet, snackLabel = "딸기우유") {
-  if (pet.tickets.snack <= 0) {
-    return { ok: false, message: "아직 간식 티켓이 없어요. 공부 3번마다 1장을 얻어요!" };
+export function updateStreakForStudy(pet, today) {
+  const last = pet.streak.lastStudyDate;
+  if (!last) {
+    pet.streak.count = 1;
+    pet.streak.lastStudyDate = today;
+    return;
   }
 
-  pet.tickets.snack -= 1;
-  pet.stats.mood = Math.min(100, pet.stats.mood + 12);
-  pet.stats.affinity += 2;
+  const diff = daysBetween(last, today);
+  if (diff === 0) return;
+  if (diff === 1) pet.streak.count += 1;
+  else pet.streak.count = 1;
 
-  const log = {
-    id: crypto.randomUUID(),
-    type: "snack",
-    date: new Date().toLocaleString("ko-KR"),
-    content: `${snackLabel} 주기 완료`,
-    expGained: 0
-  };
-
-  pet.logs.unshift(log);
-  return { ok: true, message: `${pet.name}에게 ${snackLabel}를 줬어요. 기분이 좋아졌어요!`, log };
-}
-
-export function recordCare(pet) {
-  pet.stats.mood = Math.min(100, pet.stats.mood + 8);
-  pet.stats.affinity += 4;
-
-  const log = {
-    id: crypto.randomUUID(),
-    type: "care",
-    date: new Date().toLocaleString("ko-KR"),
-    content: "쓰다듬기 기록 완료",
-    expGained: 0
-  };
-
-  pet.logs.unshift(log);
-  return { message: `${pet.name}를 쓰다듬어 줬어요. 친밀도가 올랐어요.`, log };
+  pet.streak.lastStudyDate = today;
+  pet.goals.completedToday = 0;
 }
 
 export function getStageLabel(level) {
