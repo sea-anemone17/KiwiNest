@@ -1,7 +1,13 @@
 import { createDefaultPet, migratePet } from "./state.js";
 import { savePet, clearPet } from "./storage.js";
 import { selectedSetup, qs, showSetup, showMain, renderAll, renderSetupOptions, setDialogue } from "./ui.js";
-import { recordStudy, getRandomDialogue } from "./logic.js";
+import {
+  recordStudy,
+  getRandomDialogue,
+  getQuiz,
+  checkSession,
+  getUnderstandingRecommendation
+} from "./logic.js";
 import { ensureDailyMission, setTodayTarget } from "./quests.js";
 import { updateDailyStatus, applySnackEffect, applyCareEffect, getStatusDialogue } from "./petStatus.js";
 import { recordSiblingAction, generateLetter } from "./diary.js";
@@ -17,6 +23,8 @@ export function getCurrentPet() { return currentPet; }
 export function bindEvents() {
   qs("startBtn").addEventListener("click", handleStart);
   qs("completeStudyBtn").addEventListener("click", handleStudyComplete);
+  qs("quizBtn").addEventListener("click", handleQuiz);
+  qs("startSessionBtn").addEventListener("click", handleStartSession);
   qs("studyTogetherBtn").addEventListener("click", () => handleSiblingAction("studyTogether", "같이 공부한 걸 기록했어요."));
   qs("patHeadBtn").addEventListener("click", handlePatHead);
   qs("letterBtn").addEventListener("click", handleLetter);
@@ -61,8 +69,8 @@ function handleStudyComplete() {
   const understanding = selectedSetup.understanding;
   const difficulty = selectedSetup.difficulty;
 
-  if (!content) {
-    setDialogue("무엇을 공부했는지 한 줄만 적어 주세요!");
+  if (!content || !summary) {
+    setDialogue("공부 내용과 핵심 설명은 꼭 한 줄씩 써 주세요!");
     return;
   }
 
@@ -74,6 +82,10 @@ function handleStudyComplete() {
     confusion,
     understanding
   });
+
+  const sessionResult = checkSession(currentPet);
+  const recommendation = getUnderstandingRecommendation(understanding);
+  
   ensureDailyMission(currentPet);
 
   const status = getStatusDialogue(currentPet);
@@ -82,8 +94,16 @@ function handleStudyComplete() {
     : "";
   const questMsg = result.questMessages.length ? ` ${result.questMessages.join(" ")}` : "";
 
-  saveAndRender(`${getRandomDialogue(currentPet)} EXP +${result.expGained}.${result.leveledUp ? ` 레벨업! Lv.${currentPet.level}!` : ""}${questMsg}${achievementMsg} ${status ?? ""}`);
+  const sessionMsg = sessionResult?.completed ? ` ${sessionResult.message}` : "";
+
+  saveAndRender(
+    `${getRandomDialogue(currentPet)} EXP +${result.expGained}.` +
+    `${result.leveledUp ? ` 레벨업! Lv.${currentPet.level}!` : ""}` +
+    `${questMsg}${achievementMsg}${sessionMsg} ${recommendation} ${status ?? ""}`
+  );
   qs("studyContentInput").value = "";
+  qs("summaryInput").value = "";
+  qs("confusionInput").value = "";
 }
 
 function handleSnack(snackId) {
@@ -200,6 +220,64 @@ function handleClearDiary() {
   currentPet.diary = [];
   currentPet.letters = [];
   saveAndRender("키위 일기장을 정리했어요.");
+}
+
+function handleQuiz() {
+  if (!currentPet) return;
+
+  const quiz = getQuiz(currentPet);
+
+  if (!quiz) {
+    setDialogue("아직 물어볼 질문이 없어요. 핵심 설명을 먼저 쌓아 주세요!");
+    return;
+  }
+
+  const ok = confirm(
+    `키위 질문 🧠\n\n[${quiz.subject}]\n${quiz.content}\n\n핵심 설명을 떠올려 보세요.\n\n확인하면 정답을 보여 줄게요.`
+  );
+
+  if (!ok) {
+    setDialogue("좋아요. 조금 더 생각해 봐도 괜찮아요.");
+    return;
+  }
+
+  alert(
+    `정답 확인 🥝\n\n${quiz.summary}${
+      quiz.confusion ? `\n\n헷갈렸던 점: ${quiz.confusion}` : ""
+    }`
+  );
+
+  currentPet.stats.knowledge += 2;
+  currentPet.stats.affinity += 1;
+
+  currentPet.logs.unshift({
+    id: crypto.randomUUID(),
+    type: "quiz",
+    label: "키위 질문",
+    date: new Date().toLocaleString("ko-KR"),
+    content: `${quiz.subject} 복습 질문 확인`,
+    expGained: 0
+  });
+
+  saveAndRender("키위 질문을 확인했어요. 기억을 한 번 꺼내 본 것만으로도 좋아요.");
+}
+
+function handleStartSession() {
+  if (!currentPet) return;
+
+  if (currentPet.session?.active) {
+    const result = checkSession(currentPet);
+    saveAndRender(result?.message ?? "이미 집중 세션이 진행 중이에요.");
+    return;
+  }
+
+  currentPet.session = {
+    active: true,
+    start: Date.now(),
+    targetMinutes: 25
+  };
+
+  saveAndRender("25분 집중 세션을 시작했어요. 끝나고 공부를 기록하면 세션 보상을 확인할 수 있어요.");
 }
 
 export function bootPet(pet) {
