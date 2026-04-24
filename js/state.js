@@ -53,7 +53,14 @@ export function createDefaultPet({ name, animal, theme, personality }) {
     achievements: [],
     logs: [],
     diary: [],
-    letters: []
+    letters: [],
+    reviewQueue: [],
+
+    session: {
+      active: false,
+      start: null,
+      targetMinutes: 25
+    }
   };
 }
 
@@ -93,5 +100,12 @@ export function migratePet(rawPet) {
   pet.logs = pet.logs ?? [];
   pet.diary = pet.diary ?? [];
   pet.letters = pet.letters ?? [];
+  pet.reviewQueue = pet.reviewQueue ?? [];
+
+  pet.session = {
+    active: pet.session?.active ?? false,
+    start: pet.session?.start ?? null,
+    targetMinutes: pet.session?.targetMinutes ?? 25
+  };
   return pet;
 }
