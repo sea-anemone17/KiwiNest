@@ -3,12 +3,14 @@ import { getStageLabel } from "./logic.js";
 import { getQuestProgress } from "./quests.js";
 import { getAchievementView } from "./achievements.js";
 import { getAvailableRoomItems, getEquippedRoomAssets } from "./room.js";
+import { UNDERSTANDING_LEVELS } from "./data.js";
 
 export const selectedSetup = {
   animal: "kiwi",
   theme: "green",
   personality: "playful",
-  difficulty: "medium"
+  difficulty: "medium",
+  understanding: "mid"
 };
 
 export function qs(id) {
@@ -20,6 +22,7 @@ export function renderSetupOptions() {
   renderOptionGroup("themeOptions", THEMES, "theme");
   renderOptionGroup("personalityOptions", PERSONALITIES, "personality");
   renderOptionGroup("difficultyOptions", DIFFICULTIES, "difficulty");
+  renderOptionGroup("understandingOptions", UNDERSTANDING_LEVELS, "understanding");
   renderSubjects();
 }
 
