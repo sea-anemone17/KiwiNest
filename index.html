@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dear Kiwi</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Tamagotchi Study System</p>
+        <h1>🥝 Dear Kiwi</h1>
+      </div>
+      <button id="resetBtn" class="ghost-btn" type="button">초기화</button>
+    </header>
+
+    <main>
+      <!-- SETUP SCREEN -->
+      <section id="setupScreen" class="screen setup-screen hidden">
+        <div class="card hero-card">
+          <h2>키울 친구를 정해 주세요</h2>
+          <p class="muted">공부하면 이 친구가 자라고, 간식 티켓도 얻을 수 있어요.</p>
+
+          <label class="field">
+            <span>이름</span>
+            <input id="petNameInput" type="text" placeholder="예: 몽글이" maxlength="16" />
+          </label>
+
+          <div class="field">
+            <span>동물</span>
+            <div id="animalOptions" class="option-grid"></div>
+          </div>
+
+          <div class="field">
+            <span>테마 색</span>
+            <div id="themeOptions" class="option-grid theme-grid"></div>
+          </div>
+
+          <div class="field">
+            <span>성격</span>
+            <div id="personalityOptions" class="option-grid"></div>
+          </div>
+
+          <button id="startBtn" class="primary-btn" type="button">시작하기</button>
+        </div>
+      </section>
+
+      <!-- MAIN SCREEN -->
+      <section id="mainScreen" class="screen main-screen hidden">
+        <section class="card pet-card">
+          <div class="pet-visual">
+            <div id="petEmoji" class="pet-emoji">🥝</div>
+          </div>
+
+          <div class="pet-info">
+            <p id="stageLabel" class="eyebrow">알에서 나온 키위</p>
+            <h2><span id="petName">몽글이</span> <span id="petLevel">Lv.1</span></h2>
+
+            <div class="exp-wrap">
+              <div class="exp-label">
+                <span>EXP</span>
+                <span id="expText">0 / 100</span>
+              </div>
+              <div class="exp-bar">
+                <div id="expFill" class="exp-fill"></div>
+              </div>
+            </div>
+
+            <div class="stats">
+              <div><strong id="knowledgeStat">0</strong><span>지식</span></div>
+              <div><strong id="affinityStat">0</strong><span>친밀도</span></div>
+              <div><strong id="moodStat">70</strong><span>기분</span></div>
+              <div><strong id="snackTicketStat">0</strong><span>간식 티켓</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card dialogue-card">
+          <p id="dialogueText">오늘은 뭘 배울까요?</p>
+        </section>
+
+        <section class="action-grid">
+          <button id="openStudyBtn" class="primary-btn" type="button">📚 공부 기록하기</button>
+          <button id="giveSnackBtn" class="secondary-btn" type="button">🥛 간식 주기</button>
+          <button id="careBtn" class="secondary-btn" type="button">🫳 쓰다듬기 기록</button>
+        </section>
+
+        <section class="card study-panel">
+          <h3>오늘 키위에게 가르칠 것</h3>
+
+          <label class="field">
+            <span>과목</span>
+            <select id="subjectSelect"></select>
+          </label>
+
+          <label class="field">
+            <span>공부 내용</span>
+            <input id="studyContentInput" type="text" placeholder="예: 영어 본문 1개 구조화" />
+          </label>
+
+          <div class="field">
+            <span>난이도</span>
+            <div id="difficultyOptions" class="option-grid"></div>
+          </div>
+
+          <button id="completeStudyBtn" class="primary-btn" type="button">설명 완료!</button>
+        </section>
+
+        <section class="card log-card">
+          <div class="section-title">
+            <h3>성장 일지</h3>
+            <button id="backupBtn" class="ghost-btn" type="button">백업</button>
+          </div>
+          <div id="logList" class="log-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
