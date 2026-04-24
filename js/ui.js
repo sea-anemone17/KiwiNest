@@ -204,6 +204,7 @@ export function renderAchievements(pet) {
 export function renderLogs(logs) {
   const list = qs("logList");
   list.innerHTML = "";
+
   if (!logs.length) {
     list.innerHTML = `<p class="muted">아직 성장 일지가 없어요. 첫 공부를 기록해 볼까요?</p>`;
     return;
@@ -219,6 +220,8 @@ export function renderLogs(logs) {
     } else {
       title.innerHTML = `<strong>${escapeHtml(log.label ?? log.type)}</strong> — ${escapeHtml(log.content)}`;
     }
+
+    item.appendChild(title);
 
     if (log.summary) {
       const summary = document.createElement("p");
@@ -241,7 +244,7 @@ export function renderLogs(logs) {
     if (log.leveledUp) parts.push("레벨업!");
     meta.textContent = parts.join(" · ");
 
-    item.append(title, meta);
+    item.appendChild(meta);
     list.appendChild(item);
   });
 }
